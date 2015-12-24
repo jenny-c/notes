@@ -2,7 +2,7 @@
 * Case sensitive
 
 
-##Comments: start with #
+##Comments: start with "#"
 * add for explanations
 
 
@@ -21,7 +21,7 @@
 
 --
 *Pseudocode:*
-A language that is half coding and half natural language--
+* A language that is half coding and half natural language
 --
 
 
@@ -120,7 +120,7 @@ A language that is half coding and half natural language--
 
 ##WHILE AND FOR LOOPS:
 * the while loop executes instructions repeatedly while a condition is true:
-	```
+	```python
 	i = 1
   while i < 10:
     print(i))
@@ -129,12 +129,40 @@ A language that is half coding and half natural language--
 * can use boolean values to control the loop
 * the for loop is really similar
   * used to iterate over the contents of a container (count controlled)
-		```
+		```python
 		for i in range of (1, 10)
       print(i))
 		```
-
 * For Loop Examples:
   * for i in range(6) === 0, 1, 2, 3, 4, 5
   * for i in range(10, 15) === 10, 11, 12, 13, 14
   * for i in range (0, 9, 2) === 0, 2, 4, 6, 8
+
+
+##LISTS: arrays
+* specify a list variable with []
+	* values[1] = 0 === use [] to access an element
+* differences between strings and lists:
+	* lists can hold any type of value
+	* lists are mutable -> you can change the values
+* use the len() function to determine the number of elements
+* Lists Aliases:
+	* when you copy a list, both of the variables refer to the same list
+	```python
+	scores = [10, 9, 7, 4, 5]
+	values = scores #refers to the same list
+	```
+	* you can modify the list through either variable
+	* *NOTE: to make a copy, use values = list([scores])*
+* negative subscripts provide access to the elements in reverse order
+	* ex. values[-1] give you the last element
+* List Operations:
+	* l.append("element") === adds an element to the end
+	* l.insert(1, "element") === inserts an element at the specific position
+	* if "element" in list -> print "element"
+	* l.index("element") === returns the position of the element
+	* l.pop(1) === removes the element at a given position
+	* two lists can be concantenated through the +
+	* sum() === gives the sum of the values
+	* max() and min() === gives the largest and smallest values
+	* sort() sorts a list of numbers or strings
