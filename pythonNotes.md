@@ -181,4 +181,35 @@ triple = 5, 10, 15
 	* a matrix is made when each element in a list is another list
 	* use two index values -> element[3][1]
 		* the first is the outer row, the second for the inner column
-		
+
+
+##READING AND WRITING TEXT FILES:
+* text files are very commonly used to store information
+* reading a file:
+```python
+infile = open("input.txt", "r")
+#the "r" makes it read-only
+line = infile.readline()
+#reads one line
+char = infile.read(2)
+#reads two characters
+```
+* writing to a file:
+```python
+outfile = open("output.txt", "w")
+#the "w" makes it write-only
+outfile.write("Hello, World!/n")
+```
+* *NOTE: make sure to close the file by using the close() method (ex. infile.close())*
+* to print each word on a seperate line:
+```python
+inputFile = open("lyrics.txt", "r")
+for line in inputFile :
+	line = line.rsplit()
+	wordList = line.split()
+	for word in wordList :
+		word = word.rstrip(".,?!")
+		print(word)
+
+inputFile.close()
+```
