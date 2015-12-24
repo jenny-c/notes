@@ -1,5 +1,5 @@
 #PYTHON
-* Case sensitive
+* Case sensitive language
 
 
 ##Comments: start with "#"
@@ -162,7 +162,23 @@
 	* if "element" in list -> print "element"
 	* l.index("element") === returns the position of the element
 	* l.pop(1) === removes the element at a given position
-	* two lists can be concantenated through the +
+	* two lists can be concatenated through the +
 	* sum() === gives the sum of the values
 	* max() and min() === gives the largest and smallest values
 	* sort() sorts a list of numbers or strings
+	* To Slice Lists:
+	```python
+	scores = [10, 9, 7, 4, 5]
+	values = scores[1 : 4] # first index to include and first index to ignore
+	```
+* a tuple is similar to a list, but is immutable
+```python
+triple = (5, 10, 15)
+#or without parentheses
+triple = 5, 10, 15
+```
+* Matrix:
+	* a matrix is made when each element in a list is another list
+	* use two index values -> element[3][1]
+		* the first is the outer row, the second for the inner column
+		
