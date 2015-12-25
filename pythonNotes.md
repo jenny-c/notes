@@ -1,19 +1,19 @@
-#PYTHON
+# PYTHON
 * Case sensitive language
 
 
-##Comments: start with "#"
+## Comments: start with "#"
 * add for explanations
 
 
-##Common Errors:
+## Common Errors:
 * Roundoff Errors:
 	* display a fixed number of digits or it won't display an exact number
 * Unbalanced parantheses
 	* make the brackets match
 
 
-##ALGORITHIMS: Plans that describe the steps for a problem (like a formula)
+## ALGORITHIMS: Plans that describe the steps for a problem (like a formula)
 * Should be unambiguous
 * Should be executable
 * Should be terminating
@@ -25,13 +25,13 @@
 --
 
 
-##Variables: (NOTE: use ALL CAPS for constants)
+## Variables: (NOTE: use ALL CAPS for constants)
 * choose more descriptive names
 * Booleans
   * either true or false
 
 
-##ARITHMETIC:
+## ARITHMETIC:
 * Mixing numeric types:
 	* mixing integer and float in an equation will give a float
 * Floor division:
@@ -40,7 +40,7 @@
 	* uses the "%" operator -> computes the remainder of a division equation (ex. calculating change)
 
 
-##FUNCTIONS: sequence of instructions with a name
+## FUNCTIONS: sequence of instructions with a name
 * Built-in functions:
 	* abs(x) === absolute value of x
 	* round(x) or (x, n) === rounded to a whole number or n number of decimal places
@@ -59,14 +59,14 @@
 
 
 
-##PROBLEM SOLVING:
+## PROBLEM SOLVING:
 * first solve by hand
 * test example values
 * keep applying the solution
 * devise an algorithim from your solution
 
 
-##STRINGS: Sequences of characters (unicode characters)
+## STRINGS: Sequences of characters (unicode characters)
 * the characters have numeric values
 * each character in a string has an index number (like an array)
 	* first on is 0
@@ -82,7 +82,7 @@
 	* print("%-10s%10.sf" %("Total: ", price)) === prints both; one left justified, one right justified with two decimal places
 
 
-##METHODS: Govern the behaviour of objects
+## METHODS: Govern the behaviour of objects
 * unlike functions, can only be applied to the object where it was defined
 * Useful string methods:
 	* s.lower() === lowercase version of string s
@@ -90,7 +90,7 @@
 	* s.replace(old, new) === a new version where the substring old is replaced by the string new
 
 
-##GRAPHICS: import GraphicsWindow
+## GRAPHICS: import GraphicsWindow
 * win = GraphicsWindow(640, 480) === to create a window thats 640 * 480 pixels
 * canvas = win.canvas === access the canvas in the graphics window
 * canvas.drawRect(15, 10, 20, 30) === draws a rectangle
@@ -104,7 +104,7 @@
 	* c.setColour() === sets the outline and the fill to the same
 
 
-##IF STATEMENTS: Executes code is a certain condition is met
+## IF STATEMENTS: Executes code is a certain condition is met
 * Shortcut: in one line
 	* actualFloor = floor - 1 if floor > 13 else floor
   * provide an epsilon so you can see if the floats are close enough
@@ -118,7 +118,7 @@
   * != === used to check for inequality rather than negation
 
 
-##WHILE AND FOR LOOPS:
+## WHILE AND FOR LOOPS:
 * the while loop executes instructions repeatedly while a condition is true:
 	```python
 	i = 1
@@ -139,7 +139,7 @@
   * for i in range (0, 9, 2) === 0, 2, 4, 6, 8
 
 
-##LISTS: arrays
+## LISTS: arrays
 * specify a list variable with []
 	* values[1] = 0 === use [] to access an element
 * differences between strings and lists:
@@ -183,7 +183,7 @@ triple = 5, 10, 15
 		* the first is the outer row, the second for the inner column
 
 
-##READING AND WRITING TEXT FILES:
+## READING AND WRITING TEXT FILES:
 * text files are very commonly used to store information
 * reading a file:
 ```python
@@ -213,3 +213,30 @@ for line in inputFile :
 
 inputFile.close()
 ```
+
+
+## SETS AND DICTIONARIES:
+* a set is a container that stores values
+	* different from lists -> no order, no position
+	* much faster than equivalent list operations because they don't need to maintain an order
+* Making Sets:
+```python
+#enclose within curly braces
+cast = {"Luigi", "Gumbys", "Spiny"}
+#convert any list into a set
+names = ["Luigi", "Gumbys", "Spiny"]
+cast = set(names)
+#to make an empty set, do not use {}
+cast = set()
+numberOfCharacters = len(cast) #here would be 0
+#to access elements, can't use a set position
+print("The cast of characters include:")
+for character in cast:
+	print(character)
+#sets are mutable, so you can use the .add() and .discard() methods
+cast.add("Arthur")
+cast.discard("Arthur")
+cast.clear() #removes everything
+```
+* a set is a subset of another set if every element occurs in the second set
+	* first set.issubset("the second set") -> checks whether the first set is a subset of the second set
