@@ -19,8 +19,8 @@
 * Should be terminating
 
 
---
-*Pseudocode:*
+--<br>
+## Pseudocode:
 * A language that is half coding and half natural language
 --
 
@@ -215,7 +215,7 @@ inputFile.close()
 ```
 
 
-## SETS AND DICTIONARIES:
+## SETS:
 * a set is a container that stores values
 	* different from lists -> no order, no position
 	* much faster than equivalent list operations because they don't need to maintain an order
@@ -240,3 +240,21 @@ cast.clear() #removes everything
 ```
 * a set is a subset of another set if every element occurs in the second set
 	* first set.issubset("the second set") -> checks whether the first set is a subset of the second set
+* set1.union(set2) === contains elements of both sets with no duplicates
+	* set1.intersection(set2) === contains the elements that are in both sets
+	* set1.difference(set2) === new set that has the elements that aren't in set2
+* *NOTE: use sets when managing a collection of unique items -> over 10 times faster than using lists*
+
+
+
+## Dictionaries:
+* a container that keeps associations between keys and values
+	* keys are unique, but a value can be associated with several keys
+	```python
+	favColours = {
+		"Romeo": "Green",
+		"Adam": "Red",
+	}
+	oldFavColours = dict(favColours)
+	#creates a duplicate of favColours
+	```
