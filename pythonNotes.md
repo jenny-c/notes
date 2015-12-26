@@ -257,4 +257,29 @@ cast.clear() #removes everything
 	}
 	oldFavColours = dict(favColours)
 	#creates a duplicate of favColours
-	```
+	```python
+* not sequence-type, no indexes or position
+	* can only access a value by its associated key
+* defaults keys:
+```python
+number = contacts.get("Fred", 411)
+print(number)
+#if Fred doesn't exist, 411 is default
+```
+* Editing Dictionaries:
+	* contacts["John"] = 4578102 === adds a key "John" and value of 4578102
+	* contacts["John"] = 2228102 === changes the value of "John"
+	* contacts.pop("John") === removes the entire item, key and value -> returns the value so you can store it
+* Iterating over Dictionaries:
+```python
+for key in contacts:
+	print(key, contacts[key])
+	#shows the keys
+for item in contacts.items():
+	print(item[0], item[1])
+	#the .items() method returns a sequence of tuples
+```
+
+#### MODULAR PROGRAMMING:
+* Separates files making it easier to modify a certain aspect
+* can import modules  
