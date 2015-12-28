@@ -282,4 +282,48 @@ for item in contacts.items():
 
 #### MODULAR PROGRAMMING:
 * Separates files making it easier to modify a certain aspect
-* can import modules  
+* can import modules
+
+
+## OBJECTS AND CLASSES
+* a class describes a set of objects with the same behaviour
+	* each object has its own methods
+* Methods: -> public
+	* defining methods is almost the same as a function
+		* the method has to be in the class definition
+		* the first argument has to be called self
+	* methods fall in two categories:
+		* accessor methods:
+			* gets info from the object without changing
+		* mutator methods:
+			* usually take a parameter that will change an instance variable
+			* changes the value
+* Making and Using:
+```python
+class CashRegister:
+	#Adds an item to this cash register
+	def addItem(self, price):
+		#Method body
+	def getTotal(self):
+		#Method body
+
+register1 = CashRegister()
+	#Constructs a CashRegister object
+register1.addItem(1.95) #calls the method
+```
+* each object has separate instance variables
+ 	* the variables are unique to that object
+	* use _ to start private instance variables and methods
+* the constructor:
+	* uses the special name _ _ init _ _
+	* this is where the instances are initialized
+	* only one constructor per class
+	```python
+	def _ _init_ _(self):
+		self._itemCount = 0
+		self._totalPrice = 0
+
+	def _ _init_ _(self, initialBalance = 0.0):
+		self._balance = initialBalance
+		#is no value is passed to the constructor, the default 0 will be used
+	```
