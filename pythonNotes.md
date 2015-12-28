@@ -288,7 +288,7 @@ for item in contacts.items():
 ## OBJECTS AND CLASSES
 * a class describes a set of objects with the same behaviour
 	* each object has its own methods
-* Methods: -> public
+ 	* Methods: -> public
 	* defining methods is almost the same as a function
 		* the method has to be in the class definition
 		* the first argument has to be called self
@@ -312,10 +312,10 @@ register1 = CashRegister()
 register1.addItem(1.95) #calls the method
 ```
 * each object has separate instance variables
- 	* the variables are unique to that object
+	* the variables are unique to that object
 	* use _ to start private instance variables and methods
 * the constructor:
-	* uses the special name _ _ init _ _
+	* uses the special name *_ _init_ _*
 	* this is where the instances are initialized
 	* only one constructor per class
 	```python
@@ -327,3 +327,7 @@ register1.addItem(1.95) #calls the method
 		self._balance = initialBalance
 		#is no value is passed to the constructor, the default 0 will be used
 	```
+* calling methods within another method
+	* use self.method()
+* class variables
+	* defined before the init method
