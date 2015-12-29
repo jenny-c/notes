@@ -319,11 +319,11 @@ register1.addItem(1.95) #calls the method
 	* this is where the instances are initialized
 	* only one constructor per class
 	```python
-	def _ _init_ _(self):
+	def __init__(self):
 		self._itemCount = 0
 		self._totalPrice = 0
 
-	def _ _init_ _(self, initialBalance = 0.0):
+	def __init__(self, initialBalance = 0.0):
 		self._balance = initialBalance
 		#is no value is passed to the constructor, the default 0 will be used
 	```
@@ -331,3 +331,25 @@ register1.addItem(1.95) #calls the method
 	* use self.method()
 * class variables
 	* defined before the init method
+
+
+## Inheritance
+```python
+#dave's car is a subclass of all vehicles
+class davesCar(vehicle)
+	def __init__(self):
+		. . .
+```
+* Hierarchies:
+	* superclass: a generalized class that encompasses other classes
+	* subclass: a more specialized class
+* Subclasses:
+	* inherit:
+		* all methods (unless overridden)
+		* all instance variables
+	* can:
+		* add new instance variables
+		* add new methods
+		* change the implementation of inherited methods
+* use the super() function in place of self when referring to the super class (ex. using superclass methods)
+	* the superclass constructor should be called before the subclass defines its own instance variables
