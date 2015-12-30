@@ -19,10 +19,8 @@
 * Should be terminating
 
 
---<br>
 ## Pseudocode:
 * A language that is half coding and half natural language
---
 
 
 ## Variables: (NOTE: use ALL CAPS for constants)
