@@ -61,7 +61,7 @@
 * first solve by hand
 * test example values
 * keep applying the solution
-* devise an algorithim from your solution
+* devise an algorithm from your solution
 
 
 ## STRINGS: Sequences of characters (unicode characters)
