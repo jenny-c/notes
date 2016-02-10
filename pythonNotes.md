@@ -13,7 +13,7 @@
 	* make the brackets match
 
 
-## ALGORITHIMS: Plans that describe the steps for a problem (like a formula)
+## ALGORITHMS: Plans that describe the steps for a problem (like a formula)
 * Should be unambiguous
 * Should be executable
 * Should be terminating
