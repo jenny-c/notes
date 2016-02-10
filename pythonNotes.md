@@ -9,7 +9,7 @@
 ## Common Errors:
 * Roundoff Errors:
 	* display a fixed number of digits or it won't display an exact number
-* Unbalanced parantheses
+* Unbalanced parentheses
 	* make the brackets match
 
 
@@ -75,8 +75,8 @@
 * get user input with input() (ex. name = input("Enter name"))
 	* change to int === age = int(input("Enter age"))
 * formatting strings
-	* print("%-10s" %("Total:")) === left justifys the string Total: in a width of 10
-	* print("10.2f" %(price)) === right justifys the number price with two decimal places
+	* print("%-10s" %("Total:")) === left justifies the string Total: in a width of 10
+	* print("10.2f" %(price)) === right justifies the number price with two decimal places
 	* print("%-10s%10.sf" %("Total: ", price)) === prints both; one left justified, one right justified with two decimal places
 
 
