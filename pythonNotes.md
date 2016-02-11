@@ -199,7 +199,7 @@ outfile = open("output.txt", "w")
 outfile.write("Hello, World!/n")
 ```
 * *NOTE: make sure to close the file by using the close() method (ex. infile.close())*
-* to print each word on a seperate line:
+* to print each word on a separate line:
 ```python
 inputFile = open("lyrics.txt", "r")
 for line in inputFile :
