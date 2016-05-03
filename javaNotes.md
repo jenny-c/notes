@@ -54,9 +54,24 @@ int myNumber = 525;
   }
   ```
 
-## Loops
 * for loops
-  * 
+  * syntax
+
+  ``` Java
+  for (int counter = 0; counter < 5; counter++) {
+
+    System.out.println("Counter: " + counter);
+
+  }
+
+  // or (for each loop)
+
+  for (int number : arrayOfNumbers) {
+
+    System.out.println("The number is " + number);
+
+  }
+  ```
 
 # Classes
 * keyword class
@@ -99,4 +114,21 @@ class Dog extends Animal{
 ```
 
 ## Data structures
-*
+* .size() to find size of structure
+* arrays
+  * keyword "ArrayList"
+  ``` Java
+  ArrayList<Integer> quizGrades = new ArrayList<Integer>();
+  ```
+  * use .add(value) to add values to the array
+    * to insert use .add(index, value)
+  * use .get(index) to access the values
+* dictionaries
+  * keyword "HashMap"
+  * consists of keys and values
+  ``` Java
+  HashMap<String, Integer> myDict = new HashMap<String, Integer>();
+  ```
+  * use .put(key, value) to add key value pairs to the dictionary
+  * use .get(key) to access the value associate with the key
+  * use .keySet() to access the keyset of a dictionary
