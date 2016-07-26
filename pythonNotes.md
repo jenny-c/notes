@@ -120,17 +120,17 @@
 * the while loop executes instructions repeatedly while a condition is true:
 	```python
 	i = 1
-  while i < 10:
-    print(i))
+	while i < 10:
+    	print(i))
 	```
 * *NOTE: WATCH FOR INFINITE LOOPS*
 * can use boolean values to control the loop
 * the for loop is really similar
   * used to iterate over the contents of a container (count controlled)
-		```python
-		for i in range of (1, 10)
-      print(i))
-		```
+	```python
+	for i in range of (1, 10)
+   	print(i))
+	```
 * For Loop Examples:
   * for i in range(6) === 0, 1, 2, 3, 4, 5
   * for i in range(10, 15) === 10, 11, 12, 13, 14
