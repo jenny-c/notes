@@ -26,7 +26,7 @@
 * if statement
   * use {} and "else if"
 * switch statement  
-  ``` Swift
+  ``` 
   switch fruit {
   case banana:
     print ("Banana")
@@ -37,7 +37,7 @@
   }
   ```
 * for-in loop
-  ``` Swift
+  ```
   for (key, value) in myDictionary {
     print (key)
   }
@@ -45,7 +45,7 @@
   * use ..> to make a range that omits the top value
   * use ... to make a range that includes both values
 * for loop
-  ``` Swift
+  ```
   for var i = 0; i < 4; ++i {
     print (i)
   }
@@ -53,6 +53,10 @@
 * while loop
   * while condition = true { do something }
   * condition can be placed at the end, ex.
+  ```
   repeat {
     print ("Hello")
   } while number < 5
+  ```
+
+## Functions
