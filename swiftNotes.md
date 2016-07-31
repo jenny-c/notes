@@ -26,30 +26,30 @@
 * if statement
   * use {} and "else if"
 * switch statement  
-  ``` 
-  switch fruit {
-  case banana:
-    print ("Banana")
-  case apple:
-    print ("Apple")
-  default:
-    print ("Some fruit")
-  }
-  ```
+```
+switch fruit {
+case banana:
+  print ("Banana")
+case apple:
+  print ("Apple")
+default:
+  print ("Some fruit")
+}
+```
 * for-in loop
-  ```
-  for (key, value) in myDictionary {
-    print (key)
-  }
-  ```
+```
+for (key, value) in myDictionary {
+  print (key)
+}
+```
   * use ..> to make a range that omits the top value
   * use ... to make a range that includes both values
 * for loop
-  ```
-  for var i = 0; i < 4; ++i {
-    print (i)
-  }
-  ```
+```
+for var i = 0; i < 4; ++i {
+  print (i)
+}
+```
 * while loop
   * while condition = true { do something }
   * condition can be placed at the end, ex.
