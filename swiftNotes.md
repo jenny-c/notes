@@ -60,3 +60,60 @@ for var i = 0; i < 4; ++i {
   ```
 
 ## Functions
+```
+func greet(name: String, day: String) -> String {
+  // stuff
+  return something
+}
+func greet(names: [String], day: String) -> (SomeInt: Int, SomeString: String) {
+  //stuff
+  return the stuff
+}
+```
+* use "->" to separate the arguments from the function's return type
+* nested functions have access to variables in the outer functions
+* can take another function as an argument
+* can return another function as its value
+* closures are created with no name and with {} - can be used as arguments to functions
+
+## Objects and Classes
+```
+class NamedShape {
+  var numberOfSides: Int = 0
+  var name: String
+
+  init(name: String) {
+    self.name = name
+  }
+
+  func simpleDescription() -> String {
+    return "A shape with \(numberOfSides) sides."
+  }
+}
+```
+* use keyword "class" followed by the class name and {}
+* variables, constants, functions and methods are written normally
+* create an instance of the class (ex. var circle = Shape())
+* every property needs an assigned value
+  * either like numberOfSides
+  * or through the initializer
+* subclasses have the superclass after it, separated by a ":"
+* overriding methods in subclasses
+  * use keyword "override" before
+* properties can have getters and setters
+```
+var perimeter: Double {
+  get {
+    return 3.0 * sideLength
+  }
+
+  set {
+    sideLength = newValue / 3.0
+  }
+}
+```
+  * can use "willSet" and "didSet" for code that is run before and after setting a new value
+* optional values
+  * if the value before the ? is nil, everything after that is ignored
+
+## Enumerations and Structures
