@@ -116,4 +116,16 @@ var perimeter: Double {
 * optional values
   * if the value before the ? is nil, everything after that is ignored
 
-## Enumerations and Structures
+## Enumerations
+* use the keyword "enum"
+* can have methods associated
+* often use switch statements to match individual enumeration cases
+* cases are not automatically given integer values - they are full values
+* raw-value is identified by ": Int/String" after the name
+  * only need to specify the first raw-value for Int, everything else is in order
+
+## Structures
+* use the keyword "struct"
+* support many of the same behaviours as classes
+  * difference: structures are copied every time they're passed around, classes are by reference
+  
