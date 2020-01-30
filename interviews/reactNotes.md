@@ -176,4 +176,63 @@ class MyComponent extends React.Component {
 };
 ```
 
-  - `shouldComponentUpdate()`: called when child components receive new state or props and declare whether the components should update or not 
+  - `shouldComponentUpdate(nextProps, nextState)` [returns boolean]: called when child components receive new state or props and declare whether the components should update or not 
+    - good for optimizing performance; default behaviour is to re-render every time it receives new props
+
+## Inline Styles 
+- instead of styling with a stylesheet, inline styles are common 
+ex. 
+```JSX 
+<div style={{color: "yellow", fontSize: 16}}>Mellow Yellow</div>
+// can use fontSize: "16px" too or "2em", but if written as a number, px is assumed 
+
+// using a "styles" object
+const styles = {
+  color: "purple", 
+  fontSize: 40,
+  border: "2px solid purple"
+};
+<div style={styles}>Purple with border</div>
+```
+
+- NOTE: JS can be used in the `render()` method before the `return()` method to either control what is returned or to do logic and stuff; the return statement can access the variables/constants through {}
+
+## Conditional Rendering 
+
+ex. 
+```JSX
+{this.state.boolean && <h1>the boolean is true!</h1>}
+// can put this in the return statement and if the boolean is true, then the <h1> tag will be returned 
+```
+
+### ternary operators 
+```JSX
+// basic syntax 
+condition ? expressionIfTrue : expressionIfFalse
+
+// multiple expressions
+condition1 ? if1True : condition2 ? if2true : if2false
+```
+
+### Render Condtionally From Props 
+- combine logic from above to conditionally render elements depending on props 
+- or conditionally change inline CSS based on component state 
+  - paradign is a dramatic shift from the traditional approach of applying styles by modifying DOM elements directly (you'd have to keep track of when they change and handle direct manipulation too)
+  - in react, it is preferred to have a clear flow of information in only one direction 
+
+### Array.map()
+```JSX
+this.state.myArray.map(i => <li>{i}</li>)
+```
+
+### Array.filter()
+- filters an array based on a condition and returns a new array with the passing elements 
+
+## Render React on the Server
+- reasons for rendering on server:
+  - without doing this, React apps would consist of relatively empty HTML file and a large bundle of JS -> not ideal for search engines indexing the site 
+  - faster initial page load experience since rendered HTML is smaller than the JS code of the entire app 
+    - react will manage it after the initial load 
+```JSX
+ReactDOMServer.renderToString(<App/>)
+```
