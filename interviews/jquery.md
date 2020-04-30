@@ -2,12 +2,19 @@
 
 **initial**
 ```html
-<script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js">
     $(document).ready(function() {
 
     });
 </script>
+// include the src to have Google host it (NOTE: microsoft also hosts it)
 // the code inside the function will run as soon as the browser has loaded the page (without it, the code might run before the html has rendered)
+    // note: there's an even shorter way to write this:
+<script>
+    $(function() {
+
+    });
+</script>
 ```
 
 - all jQuery functions start with $
@@ -34,6 +41,7 @@ $(".target:odd") // selects all the odd elements with the class "target" (NOTE: 
 .html("<em>new element and text</em>"); // lets you add HTML tags and text within an element 
 .text("new text"); // similar to .html, but won't evaluate HTML tags passed to it 
 .remove() // removes the HTML element 
+.hide() // hides the selected element 
 .appendTo("#left-div"); // appends the selected element to the element with the id "left-div"
 .clone() // makes a copy of an element (note: can  chain another function to the end like ".clone().appendTo())"
 .parent() // accesses the parent of the selected element 
