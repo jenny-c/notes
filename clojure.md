@@ -555,3 +555,185 @@ end
 ```
 
 # 4. Core Functions in Depth
+
+## Programming to Abstractions
+- functions like map and reduce in terms of *sequence abstraction*, not specific data structures
+- thinkg of abstractions as named collections of operations
+  - if you can perform all of an abstraction's operations on an object, then that object is an instance of the abstraction
+  - ex. `map` doesn't care about the specifics of the implementations of lists, vectors, sets, and maps
+    - only whether it can perform sequence operations on them
+
+### Treating Lists, Vectors, Sets, and Maps as Sequences
+- core sequence functions: `first`, `rest`, `cons`
+    - if these functions work on a data structure, the data structure implements the sequence abstraction
+    - if yes, then one can use the seq library with that data structure (ex. `map` function etc)
+
+### first, rest, and cons
+- if you can just implement `first`, `rest`, and `cons`, you get all the other seq library functions for free
+- ex. linked list
+  - `first`: returns the value for requested node
+  - `rest`: returns the remaining values after the requested node
+  - `cons`: adds a new node with the given value to the beginning of the list
+
+### Abstraction Through Indirection
+- **indirection**: a generic term for the mechanisms a language employs so that one name can be multiple, related meanings
+- **polymorphism** is one way that Clojure provides indirection
+- also does a kind of type conversion, calling the `seq` function on a data structure whenever it expects a sequence
+  - `seq` always returns a value that looks and behaves like a list
+    - so a seq of a map consists of two-element key-value vectors
+  - you can then convert back by using `into`
+
+## Seq Function Examples
+
+### map
+- applying a function to every element to a sequence
+- can also give map multiple collections
+  - in this case, the elements of the first collection will be passed as the first argument of the mapping function, and the elements of the second collection will be passed as the second arg and so on
+```Clojure
+; multiple collection example
+(map str ["a" "b" "c"] ["A" "B" "C"])
+; => ("aA" "bB" "cC")
+```
+- can use `map` to retrieve the value associated with a keywored from a collection of map data structures
+  - since keywords can be used as functions
+```Clojure
+(def identities
+  [{:alias "Batman" :real "Bruce Wayne"}
+   {:alias "Spider-Man" :real "Peter Parker"}
+   {:alias "Santa" :real "Your mom"}
+   {:alias "Easter Bunny" :real "Your dad"}])
+
+(map :real identities)
+; => ("Bruce Wayne" "Peter Parker" "Your mom" "Your dad")
+```
+
+### reduce
+- processes each element in a sequence to build a result
+- other uses:
+  - transform a map's values: producing a new map with the same keys but updated values
+```Clojure
+(reduce (fn [new-map [key val]]
+          (assoc new-map key (inc val)))
+        {}
+        {:max 30 :min 10})
+; => {:max 31 :min 10}
+```
+  - filter out keys from a map based on their value
+```Clojure
+(reduce (fn [new-map [key val]]
+          (if (> val 4)
+            (assoc new-map key val)
+            new-map))
+        {}
+        {:human 4.1 :critter 3.9})
+; => {:human 4.1}
+```
+
+### take, drop, take-while, and drop-while
+- `take` and `drop` take two arguments: a number and a sequence
+  - `take` returns the first n elements of the sequence
+  - `drop` returns the sequence with the first n elements dropped
+- `take-while` and `drop-while` each take a *predicate function* (return value is evaluated true/false) to determine when it shouls stop taking or dropping
+  - so `take-while` will continue taking until the function returns false
+  - `drop-while` will continue dropping until the function returns false
+
+### filter and some
+- `filter` returns all elements of a sequence that test true for a predicate function
+  - `filter` will end up processing all the data so it isn't always the most efficient to use (can use stuff like `take-while` or `drop-while` in those cases)
+- `some` tells you whether the collection contains any values that tests true for a predicate function
+  - returns the first truthy value (so anything that's not false or nil)
+
+### sort and sort-by
+- `sort` sorts elements in ascending order
+- `sort-by` allows you to apply a function (key function) to the elements and use the values returned to determine the sort order
+
+### concat
+- appends the members of one sequence to the end of another
+
+## Lazy Seqs
+- many functions return a *lazy seq*, a seq whose members aren't computed until you try to access them (which is then called *realizing* the seq)
+  - makes it more efficient and allows the construction of infinite sequences
+
+### Demonstrating Lazy Seq Efficiency
+- think of a lazy seq as two parts:
+  1. a recipe for how to realize the elements of a sequence
+  2. the elements that have been realized so far
+- so when using map, the lazy seq doesn't include any realized elements yet but it has the recipe for generating its elements
+- note: clojure chunks its lazy sequences, so it also premptively realizes some of the next elements as well (even if you only want one)
+  - lazy seq elements need to be realized only once 
+
+### Infinite Sequences
+- `repeat` and `repeatedly` allow for the creation of sequences (pretty intuitive i think)
+- lazy-seqs don't have to specify an endpoint, functions that realize the lazy-seq have no way of what will come next so as long as the seq continue providing elements, they'll keep taking them
+```Clojure
+(defn even-numbers
+  ([] (even-numbers 0))
+  ([n] (cons n (lazy-seq (even-numbers (+ n 2))))))
+
+(take 10 (even-numbers))
+; => (0 2 4 6 8 10 12 14 16 18)
+```
+
+## The Collection Abstraction
+- closely related to the sequence abstraction
+- clojure's core data structures (vectors, maps, lists, and sets) take part in both abstractions
+- sequence abstration is about operating on members individually
+- collection abstraction is about the data structure as a whole
+
+### into
+- can convert from one structure to another
+  - useful since things are often converted to `lists` when using the seq library stuff
+- also helps with taking two collections and adding all the elements from the second to the first
+
+### conj
+- also adds elements to a collection
+```Clojure
+(conj [0] [1])
+; => [0 [1]]
+
+(into [0] [1])
+; => [0 1]
+
+(conj [0] 1)
+; => [0 1]
+
+(conj [0] 1 2 3 4)
+; => [0 1 2 3 4]
+
+(conj {:time "midnight"} [:place "ye olde cemetarium"])
+; => {:time "midnight" :place "ye olde cemetarium"}
+```
+
+## Function Functions
+- these both accept and return functions
+
+### apply
+- explodes a seqable data tructure so it can be passed to a function that expects a rest parameter
+```Clojure
+(max 0 1 2)
+; => 2
+
+(max [0 1 2])
+; => [0 1 2]
+
+(apply max [0 1 2])
+; => 2
+```
+- explodes the elements of the collection so they get passed to the function as separate arguments
+
+### partial
+- takes a function and any number of arguments and then returns a new function
+  - calling the returned function calls the original function with the original arguments along with new arguments
+```Clojure
+(def add10 (partial + 10))
+(add10 3)
+; => 13
+(add10 5)
+; => 15
+```
+
+### complement
+- returns the negation of a boolean function
+```Clojure
+(def not-vampire? (complement vampire?))
+```
