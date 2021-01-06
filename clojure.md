@@ -416,3 +416,142 @@ end
 ```
 
 #### Function Body
+- function body can contain forms of any kind
+- clojure will automatically return the last form evaluated 
+- note: clojure is simple and treats all functions the exact same way
+
+### Anonymous Functions
+- two ways to create anonymous functions: one with `fn`, the other is more compact
+```Clojure
+; syntax
+(fn [param-list]
+  function body)
+
+; example
+((fn [x] (* x 3)) 8)
+; fn works identically to the normal defn
+; you can even associate it with a name using def
+
+; compact of the same example
+(#(* % 3) 8)
+```
+- `%` indicates the argument passed to the function
+  - multiple arguments would be denoted by `%1`, `%2`, `%3` and so on
+  - rest parameter would be passed with `%&`
+      - would return a list of all the arguments
+
+## Pulling It All Together
+
+### let
+- binds names to values
+- `let` also introduces a new scope 
+- can reference existing bindings in the `let` binding
+- can also use rest parameters, just like in functions
+- note: the value of the let form is the last form in its body that is evaluated
+- basically a nice way to introduce local names for values to help simplify the code
+
+### loop
+- another way to do recursion (vs just using functions)
+  - preferred since it's less verbose and has better performance
+```Clojure
+; function method
+(defn recursive-printer
+  ([]
+    (recursive-printer 0))
+  ([iteration]
+    (println (str "Iteration "iteration))
+    (if (> iteration 3)
+      (println "Goodbye!")
+      (recursive-printer (inc iteration)))))
+(recursive-printer)
+
+; loop method
+(loop [iteration 0]
+  (println (str "Iteration " iteration))
+  (if (> iteration 3)
+    (println "Goodbye!")
+    (recur (inc iteration))))
+```
+
+### Regular Expressions
+- tools for performing pattern matching on text
+```Clojure
+; syntax
+#"regular-expression"
+```
+
+### Example Code
+```Clojure
+(def asym-hobbit-body-parts [
+  {:name "head" :size 3}
+  {:name "left-eye" :size 1}
+  {:name "left-ear" :size 1}
+  {:name "mouth" :size 1}
+  {:name "nose" :size 1}
+  {:name "neck" :size 2}
+  {:name "left-shoulder" :size 3}
+  {:name "left-upper-arm" :size 3}
+  {:name "chest" :size 10}
+  {:name "back" :size 10}
+  {:name "left-forearm" :size 3}
+  {:name "abdomen" :size 6}
+  {:name "left-kidney" :size 1}
+  {:name "left-hand" :size 2}
+  {:name "left-knee" :size 2}
+  {:name "left-thigh" :size 4}
+  {:name "left-lower-leg" :size 3}
+  {:name "left-achilles" :size 1}
+  {:name "left-foot" :size 2}])
+
+(defn matching-part
+  [part]
+  {:name (clojure.string/replace (:name part) #"^left-" "right-") :size (:size part)})
+
+(defn symmetrize-body-parts
+  "Expects a seq of maps that have a :name and :size"
+  [asym-body-parts]
+  (loop [remaining-asym-parts asym-body-parts final-body-parts []]
+    (if (empty? remaining-asym-parts)
+      final-body-parts
+      (let [[part & remaining] remaining-asym-parts]
+        (recur remaining
+          (into final-body-parts
+            (set [part (matching-part part)])))))))
+```
+
+### reduce
+- pattern of "process each element in a sequence and build a result"
+```Clojure
+(reduce + [1 2 3 4])
+; is the same as
+(+ (+ (+ 1 2) 3) 4)
+```
+- it can also take an optional initial value but it's pretty much the same thing, it'll just use the initial value with the first value in the sequence
+
+### updated example code
+```Clojure
+(defn better-symmetrize-body-parts
+  "Expects a seq of maps that have a :name and :size"
+  [asym-body-parts]
+  (reduce (fn [final-body-parts part]
+            (into final-body-parts (set [part (matching-part part)])))
+          []
+          asym-body-parts))
+```
+### Hobbit violence
+- yeah i agree it's a little strange
+```Clojure
+(defn hit
+  [asym-body-parts]
+  (let [sym-parts (better-symmetrize-body-parts asym-body-parts) body-part-size-sum (reduce + (map :size sym-parts)) target (rand body-part-size-sum)]
+    (loop [[part & remaining] sym-parts accumulated-size (:size part)]
+      (if (> accumulated-size target)
+        part
+        (recur remaining (+ accumulated-size (:size (first remaining))))))))
+
+; calling the function
+(hit asym-hobbit-body-parts)
+; it'll return a random part of the body to hit
+```
+
+# 4. Core Functions in Depth
