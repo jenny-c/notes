@@ -145,10 +145,10 @@ extras: Leiningen, Boot
 
 **do**
 - note how with if you can only have one form associated with each branch
-- do helps to get around this by wrapping up multiple forms in parantheses and running each of them in the branches
+- `do` helps to get around this by wrapping up multiple forms in parantheses and running each of them in the branches
 
 **when**
-- combination of if and do but with no else branch
+- combination of `if` and `do` but with no else branch
 - returns nil when condition is false
 
 #### truthiness, equality, nil, boolean expr
@@ -736,4 +736,49 @@ end
 - returns the negation of a boolean function
 ```Clojure
 (def not-vampire? (complement vampire?))
+```
+
+# Functional Programming
+
+## Pure Functions: What and Why
+- pure function qualifications:
+  1. always returns the same result if given the same argument - *referential transparency*
+    - they rely only on their arguments and immutable values to determine return value
+  2. it can't cause any side effects (function can't make changes that are observable outside the function itself)
+    - so there is no uncertainty as to what functions are doing in a program
+
+## Living with Immutable Data Structures
+
+### Recursion Instead of for/while
+- clojure doesn't allow for mutation of values 
+  - can't associate a new value with a name without creating a new scope
+- so we use recursion instead so we don't have to keep some value and continuously mutate it
+- note: should generally use `recur` when doing recursion for performance reasons (clojure doesn't provide tail call optimization?)
+
+### Function Composition Instead of Attribute Mutation
+- another way to use mutation is to build up the final state of an object
+  - in clojure, you'll use function composition, essentially passing return values of one function into another one
+    - combining them, or nesting them 
+
+## Cool Thing to Do with Pure Functions
+
+### comp
+  - for creating a new function from the composition of any number of functions
+- if one of the functions takes more than one argument, you can wrap it in an anonymous function
+
+### memoize
+- can memoize pure functions so that clojure remembers the result of a particular function call (since they're referentially tyransparent)
+```Clojure
+(defn sleepy-identity
+  "Returns the given value after 1 second"
+  [x]
+  (Thread/sleep 1000)
+  x)
+(sleepy-identity "Mr.Fantastic")
+; => "Mr.Fantastic" after 1 second
+(defn memo-sleepy-identity (memoize sleepy-identity))
+(memo-sleepy-identity "Mr.Fantastic")
+; => "Mr.Fantastic" after 1 second
+(memoy-sleepy-identity "Mr.Fantastic")
+; => "Mr.Fantastic" immediately
 ```
