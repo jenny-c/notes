@@ -738,7 +738,7 @@ end
 (def not-vampire? (complement vampire?))
 ```
 
-# Functional Programming
+# 5. Functional Programming
 
 ## Pure Functions: What and Why
 - pure function qualifications:
@@ -781,4 +781,38 @@ end
 ; => "Mr.Fantastic" after 1 second
 (memoy-sleepy-identity "Mr.Fantastic")
 ; => "Mr.Fantastic" immediately
+```
+
+# 7. Clojure Alchemy: Reading, Evaluation, and Macros
+- can use macros to essentially define your own syntax 
+
+## Overview of Clojure's Evaluation Model
+- clojure's evaluation model: reader, evaluator, macro expander
+- clojure creates trees structured using clojure lists \rarr easy since it's in prefix notation already
+
+```Clojure
+(def addition-list (list + 1 2))
+(eval addition-list)
+; => 3
+
+(eval (concat addition-list [10]))
+; => 13
+
+(eval (list 'def 'lucky-number (concat addition-list [10])))
+; => #'user/lucky-number
+
+lucky-number
+; => 13
+```
+- clojure is *homoiconic*: represents abstract syntax trees using lists, we write textual reprsentations of lists when we write clojure code
+  - so essentially we can manipulate the data structures to do stuff
+
+## The Reader
+- converts textual source code you save in a file or enter in the REPL into clojure data structures
+  - translate between unicode characters to lists, maps, etc (other data structures)
+```Clojure
+(read-string "(+ 1 2)")
+; => (+ 1 2)
+(list? (read-string "(+ 1 2)"))
+; => true
 ```
