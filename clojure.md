@@ -2,100 +2,6 @@
 https://clojure.org/api/cheatsheet
 - clojure is functional language 
 
-# Syntax
-
-## Literals
-
-### Numeric Types
-- are fixed precision 64-bit when in range, arbitrary otherwise
-- trailing N can be used to force precision
-- octal, hex, arbitray radix etc
-- ratios are their own type
-
-### Character Types
-- normal string character stuff
-- special named characters; `\newline \spec \tab` etc
-- literal regular expressions are strings with leading #
-
-### Symbols and Indents
-- symbols are as you expect
-  - can have namespace separated with a forward slash from the name
-- `nil true false` are boolean values and are special symbols
-- keywords start with leading colon and evaluate to themselves
-
-### Literal Collections
-- four collection types
-  1. list '(1 2 3)
-  2. vector [1 2 3]
-  3. set #{1 2 3}
-  4. map {:a 1, :b 2}
-
-## Evaluation
-- source code is read as characters by the Reader
-  - Reader produces Clojure data
-  - Clojure compiler then produces the bytecode for the JVM
-notes:
-- unit of source code is a **Clojure expression**, not a Clojure source file
-
-### Structure vs Semantics
-- most literal Clojure forms evaluate to themselves, except symbols and lists
-  - symbols are used to refer to something else
-  - lists are evaluated as an invocation
-- ex. (+ 3 4)
-  - read as a list containing the symbol (+) and two numbers (3 4)
-  - first element is called the "function position", where the thing to invoke is
-- note: in clojure, everything is an expression that evaluates to some value 
-  - some expressions also have side effects
-  - contrast to most languages which have statements (affect state but don't return anything) and expressions
-
-### Delaying Evaluation with Quoting
-- sometimes useful to suspend evaluation
-- so we do `'x` to get `x`
-- and we do `'(1 2 3)` to get a list instead of code to evaluate 
-- ex. `(1 2 3)` would return an error since we can't evaluate a list of data
-
-## REPL
-- read-eval-print-looop
-- note: clojure is always compilted to JVM bytecode (no clojure interpreter)
-- namespace `clojure.repl` that is included in the standard Clojure library that provides a number of functions
-    - `(require '[clojure.repl :refer :all])`
-    - `doc` is a command that will show the documentation for any function
-
-## Clojure Basics
-- `def`: save piece of data for later (like a variable)
-- printing:
-  - `println` and `print`: human-readable forms, will translate special print characters to their printed form (will omit quotes in strings)
-  - `prn` and `pr`: readable as data, will print surrounding quotes and ignore special characters like \n
-
-# Functions
-
-## Creating Functions
-- functions are first class, can be passed-to and returned-from other functions
-- more clojure code consists of primarily pure functions
-- you can invoke a function by placing the name of the function in the function position (the first element in a list)
-
-### Multi-arity Functions
-- functions can be defined to take different numbers of parameters
-  - must all be defined in the same `defn` (else they will just replace the previous function instead of adding to it)
-- each arity is a list `([param*] body*)`
-  - one arity can invoke another
-  - ex.
-```
-(defn messenger
-  ([]    (messenger "Hello world!"))
-  ([msg] (println msg))
-)
-```
-
-### Variadic Functions
-- can also define a variable number of parameters 
-  - the variable parameters must occur at the end of the paramter list (collected in a sequence for use by the function)
-- marked with `&`
-```
-(defn hello [greeting & who]
-  (println greeting who))
-```
-
 # Clojure for the Brave and True
 **PARTS:**
 ENVIRONMENT SETUP
@@ -788,7 +694,7 @@ end
 
 ## Overview of Clojure's Evaluation Model
 - clojure's evaluation model: reader, evaluator, macro expander
-- clojure creates trees structured using clojure lists \rarr easy since it's in prefix notation already
+- clojure creates trees structured using clojure lists &rarr; easy since it's in prefix notation already
 
 ```Clojure
 (def addition-list (list + 1 2))
@@ -815,4 +721,192 @@ lucky-number
 ; => (+ 1 2)
 (list? (read-string "(+ 1 2)"))
 ; => true
+
+;; reading anonymous functions
+(#(+ 1 %) 3)
+; => 4
+(read-string "#(+ 1 %)")
+; => (fn* [p1__423#] (+ 1 p1__423#))
 ```
+
+### Reader Macros
+- the above example of reading an anonymous function with `read-string` works through using a *reader macro* (sets of rules for transforming text into data structures)
+- essentially they take a abbreviated reader form and then expand it to their full form
+  - *macro characters*: `'`, `#`, `@` etc
+```Clojure
+(read-string "'(a b c)")
+; => (quote (a b c))
+(read-string "@var")
+; => (clojure.core/deref var)
+(read-string "; ignore!\n(+ 1 2)")
+; => (+ 1 2)
+```
+
+## The Evaluator
+- think of the evaluator as a function that takes a DS as an argument, processes the DS using rules corresponding to its type and returns a result
+- thing that aren't lists of symbols evaluate to themselves (as well as empty lists)
+
+### Symbols
+- symbols are used to name functions, macros, data etc, and then evaluates by *resolving* them
+**resolves by:**
+1. looking up whether the symbol names s special form
+2. looking up whether the symbol corresponds to a local binding
+3. trying to find a namespace mapping introduced by `def`
+4. throwing an exception
+
+### Lists
+- empty list evaluates to an empty list
+- otherwise, evaluated as a call to the first element in the list
+
+#### Function Calls
+- each operand is fully evaluated (in the recursive manner mentioned above)
+- often time the operands will resolve to themselves but when we nest we see how it works
+```Clojure
+;; to get an actual list we use the ' reader macro
+'(a b c)
+;; is the same as
+(quote (a b c))
+;; quote special form tells the evaluator to return the DS itself without evaluating like normal
+```
+
+### Macros
+- can manipulate the DSs that clojure evaluates
+```Clojure
+(eval (read-string "(1 + 1)")) ; => will throw an exception
+
+(let [infix (read-string "(1 + 1)")]
+  (list (second infix) (first infix) (last infix)))
+; => (+ 1 1)
+
+(eval
+  (let [infix (read-string "(1 + 1)")]
+    (list (second infix) (first infix) (last infix))))
+; => 2
+```
+- macros streamline this process
+- are executed in between the reader and the evaluator
+```Clojure
+(defmacro ignore-last-operand
+  [function-call]
+  (butlast function-call))
+
+(ignore-last-operand (+ 1 2 10))
+; => 3
+
+(ignore-last-operand (+ 1 2 (println "this won't get printed")))
+; => 3
+```
+- note: the DS returned by the function is not evaluated, but the DS returned by the macro is
+  - can use `macroexpand` to see what data structure a macro returns before the DS is evaluated
+```Clojure
+(macroexpand '(ignore-last-operand (+ 1 2 10)))
+; => (+ 1 2)
+(macroexpand '(ignore-last-operand (+ 1 2 (println "this won't get printed"))))
+; => (+ 1 2)
+```
+
+### Syntactic Abstraction and the -> Macro
+- clojure is essentially just a bunch of nested function calls
+- `->` (threading or stabby macro) allows you to write stuff to understand from top-down/left-right
+```Clojure
+(defn read-resource
+  "Read a resource into a string"
+  [path]
+  (read-string (slurp (clojure.java.io/resource path))))
+;; can be rewritten as 
+(defn read-resource
+  [path]
+  (-> path
+      clojure.java.io/resource
+      slurp
+      read-string))
+;; a pipeline that goes from to pto bottom instead of from inner parentheses to outer parantheses
+```
+- this is *syntactic abstraction*, lets us write code in a syntax that's different from Clojure's built-in syntax
+
+# Writing Macros
+
+
+---
+
+# Reframe: The Basics
+- functional framework for building web apps in clojurescript using React through reagent
+
+## A Data Loop
+- clojurescript is a modern LISP ( **homoiconic** )
+- progrmaming through assembling data structures
+
+- to build an app, hang pure functions on certain parts of the loop, re-frame looks after the **conveyance of data** around the loop (tag line for re-frame is "derived values, flowing")
+
+- each iteration of the re-frame loop has 6 stages &rarr; like a domino cascade
+1. event dispatch
+  - event is sent when something happens (ex. button click, websocket receives a message etc)
+  - without a triggering event, no cascade happens 
+    - events propel the app from one state to another &rarr; **re-frame is event driven**
+2. event handling
+  - in response to an event, the app performs as action
+  - functions which compute data essentially 
+    - figure out what the required `side effects` are
+3. effect handling
+  - the `side effects` previously calculated are actioned
+  - often just change the application state 
+  - `v = f(s)` where `v` is a view, `f` is a function, and `s` is the app state
+    - every time `s` changes, `f` will be rerun to compute a new `v`
+4. query
+  - about extracting data from "app state" and providing it in the right format for the fifth stage
+5. view
+  - many `ViewFunctions` (Reagent components) which render the UI of the application
+  - compute and return data in **hiccup** which represents DOM
+  - renders the DOM depending on the state/data from the last stage
+6. DOM
+  - handled by Reagent/React
+    - the step in which the hiccup-formatted "descriptions of required DOM" are actioned
+
+## State
+- puts all state in one place (a readent atom)
+- **benefits:**
+  - a single source of truth, no code needed to synchronize state between many different stateful components
+  - can be updated with a single `reset!` 
+    - the transition from one state to another is instant, not a series of incremental steps
+  - the data can be given a strong schema so that, at any moment, we can validate all the data in the app
+    - do this check after every "event handler"
+  - undo/redo becomes easy to implement since it's easier to make snapshots of the state and restore them
+- will want to learn [spec](https://clojure.org/about/spec)
+**Stages:**
+1. `re-frame.core/dispatch`
+  - call re-frame's dispatch to emit an `event`
+2. `re-frame.core/reg-event-fx`
+  - register handlers for events using `reg-event-fx`
+3. `re-frame.core/reg-fx`
+  - re-frame app can register `effects handlers` using `reg-fx`
+4. `re-frame.core/reg-sub`
+  - used to associate a query function with a query id
+```Clojure
+(re-frame.core/reg-sub ;; part of the re-frame API
+  :query-items         ;; query id
+  query-fn)            ;; function to perform the query
+;; if, in stage 5, you see a (subscribe [:query-items]), then call query-fn to compute it
+```
+5. `re-frame.core/subscribe`
+  - works with the previous and next stages to see which DOMs need to be recomputed
+6. hiccup returned by the view function is made into real browser DOM by reagent/React
+
+## Subscriptions
+- data flows through **the signal graph**
+  - transformed by the interior nodes (which are pure functions)
+  - eventually arrives at the leaf `view functions`
+
+### Four Layers of The Signal Graph
+1. ground truth (root node, `app-db`)
+2. extractors
+  - subscriptions that extract data directly from `app-db`
+3. materialised view
+  - subscriptions which obtain data from other subscriptions (never directly from `app-db`)
+4. view functions
+  - leaf nodes which compute hiccup (DOM)
+- simplest version of the graph doesn't even have a layer 3
+
+## Effectful Handlers
+- events happen when they are dispatched (typically triggered by an external agent)
+  - then they must be "handled"
+  - note: events are *mutative* by nature (if app in one state before an event is processed, it will be in a diff state after)
