@@ -910,3 +910,198 @@ lucky-number
 - events happen when they are dispatched (typically triggered by an external agent)
   - then they must be "handled"
   - note: events are *mutative* by nature (if app in one state before an event is processed, it will be in a diff state after)
+```Clojure
+(re-frame.core/reg-event-db      ;; <-- call this to register a handler
+  :set-flag                      ;; thsi is an event id
+  (fn [db [_ new-value]]         ;; this function does the handling
+      (assoc db :flag new-value)))
+```
+- the handler `fn` is expected to be pure
+- so this works most of the time, but sometimes there has to be side effects which complicate everything
+```Clojure
+(reg-event-db
+  :my-event
+  (fn [db [_ bool]]
+      (dispatch [:do-something-else 3])  ;; oops, side-effect
+      (assoc db :send-spam new-val)))
+```
+- bad for a number of reasons: function's readers need to try harder to understand it, testing becomes harder, even replay-ability is lost
+- note: a function is also not pure if it uses data from somewhere other than its arguments
+- **effects:** what the event handler does to the world 
+- **coeffects:** the data the event handler requires from the world in order to its computation
+- some event handlers will have effects and coeffects (living in a mutative world)
+  - instead of doing side-effects, we'll *cause* side-effects (re-frame looks after them basically)
+```Clojure
+;; this event handler is pure
+(reg-event-db
+  :my-event
+  (fn [db _]
+      (assoc db :flag true)))
+```
+
+### Effects: The Two Step Plan
+1. work out how event handlers can declaratively describe side-effects, in data
+2. work out how re-frame can do the "necessary side-effecting" efficiently and discreetly
+
+#### Step 1
+```Clojure
+;; impure, side effecting handler
+(reg-event-db
+  :my-event
+  (fn [db [_a]]
+      (dispatch [:do-something-else 3]) ;; side-effect
+      (assoc db :flag true)))
+
+;; rewritten to be pure
+(reg-event-fx                               ;; using reg-event-fx instead
+  :my-event
+  (fn [{:keys [db]} [_ a]]                  ;; destructuring db; first param is a map containing a :db key
+      {:db (assoc db :flag true)            ;; handler is returning a map which describes a 1. change to application state, via :db key and 2. a further event, via the :dispatch key
+       :dispatch [:do-something-else 3]}))
+
+
+;; another example
+;; impure way
+(reg-event-db
+  :my-event
+  (fn [db [_ a]]
+      (GET "http://json.my-endpoint.com/blah" ;; side-effect
+          {:handler       #(dispatch [:process-response %1])
+           :error-handler #(dispatch [:bad-response %1])})
+      (assoc db :flag true)))
+
+;; pure alternative
+(reg-event-fx
+  :my-event
+  (fn [{:keys [db]} [_ a]]
+      {:http {:method :get
+              :url    "http://json.my-endpoint.com/blah"  ;; describes the side-effects required instead of doing them
+              :on-success  [:process-blah-response]
+              :on-fail     [:failed-blah]}
+       :db   (assoc db :flag true)}))
+```
+
+#### The Coeffects
+```Clojure
+;; -fx handlers have been written this way
+(reg-event-fx
+  :my-event
+  (fn [{:keys [db]} event]  ;; <- destructuring to get db
+      {...}))
+
+;; naming the first argument
+(reg-event-fx
+  :my-event
+  (fn [cofx event]  ;; named cofx
+      {...}))
+```
+- when using `-fx` form of registration, the first argument of the handler will be a map of coeffects we name `cofx`
+- so `-db` and `-fx` handlers are conceptually the same, differing only numerically 
+  - `-db` handlers take one coeffect called `db`, and return one effect `db`
+  - `-fx` handlers take potentially many coeffects (map), and return potentially many effects (map)
+```Clojure
+;; these handlers achieve the same thing
+(reg-event-db
+  :set-flag
+  (fn [db [_ new-value]]
+      (assoc db :flag new-value)))
+
+(reg-event-fx
+  :set-flag
+  (fn [cofx [_ new-value]]
+      {:db (assoc (:db cofx) :flag new-value)}))
+```
+- `-db` is simpler and should be used whenever possible 
+
+## Interceptors
+- wrap event handlers
+  - implement middleware (but different)
+  - assemble functions, as data, in a collection &rarr; chain of interceptors
+    - data is iteratively pipelined, first forwards through the chain of functions, then backwards along the same chain
+- in re-frame:
+  - the forward sweep progressively creates coeffects 
+  - the backwards sweep processes the effects
+```Clojure
+;; interceptor form
+{:id     :something           ;; decorative only
+ :before (fn [context] ...)   ;; returns a possibly modified `context`
+ :after  (fn [context] ...)}  ;; returns a possibly modified `context`
+```
+- to execute an inteceptor chain:
+  1. create a context (a map with a certain structure)
+  2. iterate forwards in the chain, challing the :before function and threading context through
+  3. iterate over the chain backwards, calling the :after function and threading context through all the calls
+- **context**
+```Clojure
+;; context is a map with this structure
+{:coeffects {:event [:some-id :some-param]
+             :db    <original contents of app-db>}
+
+ :effects   {:db    <new value for app-db>
+             :dispatch [:an-event-id :param1]}
+
+ :queue     <a collection of further interceptors>
+ :stack     <a collection of interceptors already walked>}
+```
+- note: can be self-modifying (interceptors can be dynamically added and removed from `:queue` and `:stack` by other interceptors in the chain)
+
+- general:
+  1. when an event handler is registered, a collection of interceptors is supplied
+  2. when registering an event handler, associating an event id with a chain of interceptors
+  3. interceptor chain is executed in two stages (forward sweep and backwards sweep)
+  4. interceptors: add to `:coeffects`, process side `:effects`, produce logs, and further process
+
+## Effects
+```Clojure
+;; when handler registered with -fx, must return effects
+(reg-event-fx
+  :my-event
+  (fn [cofx [_ a]]    ;; first arg is coeffects, not db
+    {:db      (assoc (:db cofx) :flag a) ;; side effect on app-db
+     :fx      [[:dispatch [:do-something-else 3]]]})) ;; return effects; dispatch this event
+```
+- can register your own side effects with `reg-fx`
+```Clojure
+(reg-fx
+  :butterfly   ;; effect key
+  (fn [value]  ;; effect handler
+    ...
+    ))
+```
+- note: when handler is registered using either `-db` or `-fx`, an interceptor, `do-fx` is inserted at the beginning of the chain
+  - so its `:after` function is the last thing run in the chain 
+    - extracts `:effects` from `context` and iterates across the key/value pairs it contains, calling the registered effect handlers for each
+
+## Coeffects
+- current state of the world, in data, as presented to an event handler
+- `coeffects` is a superset of `db`: it contains `db`
+- need a way to put the data we want into `cofx` so we can access it the way we want
+
+- each time an event is handled, a new `context` map is created, which contains a `:coeffects` key
+  - so the handler's interceptor chain which can add to the data eventually seen by the event handler
+  - do this with `inject-cofx`
+```Clojure
+;; event handler with access to 3 coeffects
+(reg-event-fx
+  :some-id
+  [(inject-cofx :random-int 10) (inject-cofx :now) (inject-cofx :local-store "blah")]
+  (fn [cofx _]
+    ... )) ;; have access to cofx's keys :random-int :now and :local-store
+```
+- now it needs to know what to when given these pieces of data; each cofx-id requires an action
+  - do this with `reg-cofx`
+```Clojure
+(reg-cofx             ;; registration function
+  :now                ;; what cofx-id we are registering
+  (fn [coeffects _]   ;; second parameter not used in this case
+    (assoc coeffects :now (js.Date.))))  ;; add :now key, with value
+
+;; another example
+(reg-cofx
+  :local-store
+  (fn [coeffects local-store-key]
+    (assoc coeffects
+           :local-store
+           (js->clj (.getItem js/localStorage local-store-key)))))
+```
+note: `inject-cofx :db` is also added at the front of each chain
